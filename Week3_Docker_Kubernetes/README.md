@@ -197,14 +197,37 @@ Removing intermediate container f66a8d7d351e
 Successfully built c776ce3c4e27
 Successfully tagged python-app:latest
 ~~~
- Results:  
- Image size 53mb on disk, 20mb compressed at docker hub  
+Results:  
+Image size 53mb on disk, 20mb compressed at docker hub  
 
- ![docker](img/d_i.png)
- ![hub](img/hub.png)
+![docker](img/d_i.png)
+![hub](img/hub.png)
 
- ## Setup K8S cluster using Minikube(1 master + 1 worker node is enough): - 1
+## Setup K8S cluster using Minikube(1 master + 1 worker node is enough): - 1
 
+Installing kubectl & minikube
+~~~
+shurik@pltk04:~$ curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 44.7M  100 44.7M    0     0  6398k      0  0:00:07  0:00:07 --:--:-- 5888k
+shurik@pltk04:~$ chmod +x ./kubectl
+shurik@pltk04:~$ sudo mv ./kubectl /usr/local/bin/kubectl
+[sudo] password for shurik: 
+shurik@pltk04:~$ kubectl version --client
+Client Version: version.Info{Major:"1", Minor:"22", GitVersion:"v1.22.2", GitCommit:"8b5a19147530eaac9476b0ab82980b4088bbc1b2", GitTreeState:"clean", BuildDate:"2021-09-15T21:38:50Z", GoVersion:"go1.16.8", Compiler:"gc", Platform:"linux/amd64"}
+shurik@pltk04:~$ curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
+>   && chmod +x minikube
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 65.8M  100 65.8M    0     0  6209k      0  0:00:10  0:00:10 --:--:-- 5909k
+shurik@pltk04:~$ sudo mkdir -p /usr/local/bin/
+shurik@pltk04:~$ sudo install minikube /usr/local/bin/
+shurik@pltk04:~$ minikube version
+minikube version: v1.23.2
+commit: 0a0ad764652082477c00d51d2475284b5d39ceed
+~~~
+![minikube](img/minikube.png)
 
 ## Deploy the application into the K8S cluster - 3
 
