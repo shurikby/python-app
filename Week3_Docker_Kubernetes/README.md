@@ -231,8 +231,51 @@ commit: 0a0ad764652082477c00d51d2475284b5d39ceed
 
 ## Deploy the application into the K8S cluster - 3
 
+Creating basic Deployment.yaml:  
 
+~~~
+kubectl create deployment python-app --image shurikby/python-app:v1.0 --dry-run=client -oyaml >Deployment.yaml
+~~~
 
+Deployment.yaml at this moment:  
+
+~~~
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: python-app
+  name: python-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-app
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: python-app
+    spec:
+      containers:
+      - image: shurikby/python-app:v1.0
+        name: python-app
+        resources: {}
+status: {}
+~~~
+
+Deploying:  
+
+~~~
+[shurik@pltk04 python-app (⎈ |multinode-demo:default)]$ kubectl apply -f Deployment.yaml
+deployment.apps/python-app created
+~~~
+
+Result:  
+
+![deploy](img/deploy1.png)
 ## * The deployment requires 3 replicas, “RollingUpdate” strategy. Emulate the “RollingUpdate” strategy by updating docker image. Provide screenshots. Define the liveness and readiness probes to /health endpoint and 8080 port, resources(requests/limits)
 
 
