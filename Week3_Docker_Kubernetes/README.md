@@ -275,11 +275,122 @@ deployment.apps/python-app created
 
 Result:  
 
-![deploy](img/deploy1.png)
+![deploy](img/deploy1.png)  
+
 ## * The deployment requires 3 replicas, “RollingUpdate” strategy. Emulate the “RollingUpdate” strategy by updating docker image. Provide screenshots. Define the liveness and readiness probes to /health endpoint and 8080 port, resources(requests/limits)
 
+Updated Deployment.yaml for this task:
+
+~~~
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: python-app
+  name: python-app
+spec:
+  replicas: 3     # 3 replicas of our application
+  selector:
+    matchLabels:
+      app: python-app
+  strategy:
+    rollingUpdate:        # Rolling update strategy:
+      maxSurge: 1         # It can be one additional pod during update 
+      maxUnavailable: 1   # One less pods can be up and running during update 
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: python-app
+    spec:
+      containers:
+      - image: shurikby/python-app:v1.0
+        name: python-app
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 10
+        resources:
+          limits:
+            memory: "200Mi"
+            cpu: "30m"
+          requests:
+            memory: "40Mi"
+            cpu: "5m"
+status: {}
+~~~
+
+To make any sense of using both readiness and liveness probes in this case I used failureThreshold=10 for liveness probe. By default the value is 3, so 3 fails will trigger readinessProbe and temporary disable the pod. After that, if it will not recover fast enough, after 10 tries it will be killed by livenessProbe and recreated. To be honest, I am not shure if it realy will work that way and I don't know how to test it on this app, but it should work this way.
+
+To set the proper ammount of resources for containers, I have installed metrics server for k8s and set the ammounts in Deployment.yaml with some margin.
+
+![top](img/top.png)
+
+Results:
+
+![pods](img/3pods.png)
+
+![They see me rollin', they hatin'](img/rolling.png)
+
+![describe](img/describe.png)
 
 ## * Create a “Service” object which exposes Pods with application outside the K8S cluster in order to access each of the replicas through the single IP address/DNS name.
 
+~~~
+kubectl expose deployment/python-app --type=NodePort --port=8080 --dry-run=client -oyaml > service.yaml
+kubectl apply -f service.yaml
+~~~
+
+Service.yaml:
+
+~~~
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: python-app
+  name: python-app
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: python-app
+  type: NodePort
+status:
+  loadBalancer: {}
+~~~
+
+Checking if it works:  
+
+![nodeport](img/nodeport.png)
+
+In this setup minikube uses a docker containers to run nodes on, so our exposed app is accesible using IP adress of this docker container. That's why I had to list minikube profiles.
 
 ## * Specify PodDistruptionBudget which defines that only 1 replica can be down.
+
+PodDistributionBudget.yaml:  
+
+~~~
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: python-app-pdb
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: python-app
+~~~
