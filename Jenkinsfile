@@ -23,6 +23,7 @@ pipeline {
                  echo "Coming soon"
             }
         }
+    }
 	post{
 		success {
 			echo "Success"
