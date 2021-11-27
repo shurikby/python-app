@@ -6,6 +6,11 @@ pipeline {
         dockerImage = '' 
     }
     stages {
+        stage('Test network') {
+            steps {
+                 sh ("echo 'nameserver 8.8.8.8' > /etc/resolv.conf")
+            }
+        }
         stage('Build docker image') {
             steps {
                 script {
