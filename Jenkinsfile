@@ -8,13 +8,17 @@ pipeline {
     stages {
         stage('Build docker image') {
             steps {
-                dockerImage = docker.build repository + ":$BUILD_NUMBER" 
+                script {
+                    dockerImage = docker.build repository + ":$BUILD_NUMBER" 
+                }
             }
         }
         stage('Store image on artifactory') {
             steps {
-                docker.withRegistry( 'https://shurikby.jfrog.io/final-docker/', registryCredential ) { 
-                    dockerImage.push() 
+                script {
+                    docker.withRegistry( 'https://shurikby.jfrog.io/final-docker/', registryCredential ) { 
+                        dockerImage.push() 
+                    }
                 }
             }
         }
