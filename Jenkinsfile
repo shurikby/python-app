@@ -24,7 +24,11 @@ pipeline {
         }
         stage('Deploy into k8s') {
             steps {
-                 echo "Coming soon"
+                script {
+                    withKubeConfig([credentialsId: 'kubectl', serverUrl: 'https://192.168.1.16:6443']) {
+                        sh 'cat Deployment.yaml | sed "s/{{BUILD_NUMBER}}/${BUILD_NUMBER:=1}/g" | kubectl apply -f -'
+                    }
+                }
             }
         }
     }
