@@ -16,7 +16,8 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://shurikby.jfrog.io', 'artifactory' ) { 
-                        dockerImage.push() 
+                        dockerImage.push("$BUILD_NUMBER") 
+                        dockerImage.push("latest") 
                     }
                 }
             }
