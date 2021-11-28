@@ -5,6 +5,7 @@ metadata:
   labels:
     app: python-app
   name: python-app
+  namespace: python-app
 spec:
   replicas: 3     # 3 replicas of our application
   selector:
@@ -21,7 +22,7 @@ spec:
         app: python-app
     spec:
       containers:
-      - image: shurikby/python-app:v1.0
+      - image: shurikby.jfrog.io/final-docker/python-app:latest
         name: python-app
         readinessProbe:
           httpGet:
@@ -43,4 +44,6 @@ spec:
           requests:
             memory: "40Mi"
             cpu: "5m"
+      imagePullSecrets:
+      - name: jfrog-docker
 status: {}
