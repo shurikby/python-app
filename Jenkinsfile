@@ -15,9 +15,7 @@ pipeline {
         stage('Store image on artifactory') {
             steps {
                 script {
-                    withCredentials([usernamePassword( credentialsId: 'artifactory', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         docker.withRegistry('https://shurikby.jfrog.io', 'artifactory' ) { 
-                            sh "docker login https://shurikby.jfrog.io -u ${USERNAME} -p ${PASSWORD}"
                             dockerImage.push() 
                         }
                     }
