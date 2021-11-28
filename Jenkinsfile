@@ -15,9 +15,8 @@ pipeline {
         stage('Store image on artifactory') {
             steps {
                 script {
-                        docker.withRegistry('https://shurikby.jfrog.io', 'artifactory' ) { 
-                            dockerImage.push() 
-                        }
+                    docker.withRegistry('https://shurikby.jfrog.io', 'artifactory' ) { 
+                        dockerImage.push() 
                     }
                 }
             }
