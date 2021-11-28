@@ -7,6 +7,7 @@ from aiohttp import web
 VERSION = str(pkg_resources.require("demo")[0].version)
 HOSTNAME = os.environ.get('HOSTNAME')
 EXTERNAL_URL = os.environ.get('EXTERNAL')
+BUILD = "{{BUILD_NUMBER}}"
 
 
 async def health(request: web.Request):
@@ -15,9 +16,10 @@ async def health(request: web.Request):
 
 async def app_info(request: web.Request):
     return web.Response(
-        body="Hostname: {}. Version: {}".format(
+        body="Hostname: {}. Version: {}. Build: {}".format(
             HOSTNAME,
             VERSION,
+            BUILD
         )
     )
 

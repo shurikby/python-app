@@ -5,6 +5,11 @@ pipeline {
         dockerImage = '' 
     }
     stages {
+        stage('Configure app build number') {
+            steps {
+                sh 'sed -i -e "s/{{BUILD_NUMBER}}/${BUILD_NUMBER:=1}/g" application/demo/views.py'
+            }
+        }
         stage('Build docker image') {
             steps {
                 script {
