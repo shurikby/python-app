@@ -6,6 +6,7 @@ metadata:
     app: python-app
     branch: $BRANCH_NAME
   name: python-app-$BRANCH_NAME
+  namespace: python-app
 spec:
   replicas: 3     # 3 replicas of our application
   selector:
@@ -19,7 +20,7 @@ spec:
         branch: $BRANCH_NAME
     spec:
       containers:
-      - image: shurikby.jfrog.io/final-docker/python-app/${BRANCH_NAME}:${BUILD_NUMBER}
+      - image: shurikby/python-app:v1.0
         name: python-app
         readinessProbe:
           httpGet:
@@ -41,6 +42,4 @@ spec:
           requests:
             memory: "40Mi"
             cpu: "5m"
-      imagePullSecrets:
-      - name: jfrog-docker
 status: {}
