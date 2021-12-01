@@ -35,10 +35,13 @@ pipeline {
                     withKubeConfig([credentialsId: 'kubectl', serverUrl: 'https://192.168.1.16:6443']) {
                         sh '''
                             envsubst < k8s/Deployment.yaml | kubectl apply -n python-app -f -
+                            envsubst < k8s/Deployment.yaml | cat
                             envsubst < k8s/service.yaml | kubectl apply -n python-app -f -
+                            envsubst < k8s/service.yaml | cat
                             export WEIGHT_CANARY=100
                             export WEIGHT_MAIN=0
-                            /usr/local/bin/envsubst < k8s/ingress.yaml | kubectl apply -n python-app -f -    
+                            envsubst < k8s/ingress.yaml | kubectl apply -n python-app -f - 
+                            envsubst < k8s/ingress.yaml | cat
                         '''
                     }
                 }
