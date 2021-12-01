@@ -8,6 +8,7 @@ VERSION = str(pkg_resources.require("demo")[0].version)
 HOSTNAME = os.environ.get('HOSTNAME')
 EXTERNAL_URL = os.environ.get('EXTERNAL')
 BUILD = "{{BUILD_NUMBER}}"
+BRANCH = "{{BRANCH_NAME}}"
 
 
 async def health(request: web.Request):
@@ -16,10 +17,11 @@ async def health(request: web.Request):
 
 async def app_info(request: web.Request):
     return web.Response(
-        body="Hostname: {}. Version: {}. Build: {}".format(
+        body="Hostname: {}. Version: {}. Build: {} from branch '{}'".format(
             HOSTNAME,
             VERSION,
-            BUILD
+            BUILD,
+            BRANCH
         )
     )
 

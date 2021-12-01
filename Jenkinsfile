@@ -1,13 +1,14 @@
 pipeline {
     agent any
     environment { 
-        repository = "shurikby.jfrog.io/final-docker/python-app" 
+        repository = "shurikby.jfrog.io/final-docker/python-app/$BRANCH_NAME" 
         dockerImage = '' 
     }
     stages {
-        stage('Configure app build number') {
+        stage('Configure app') {
             steps {
                 sh 'sed -i -e "s/{{BUILD_NUMBER}}/${BUILD_NUMBER:=1}/g" application/demo/views.py'
+                sh 'sed -i -e "s/{{BRANCH_NAME}}/${BRANCH_NAME}/g" application/demo/views.py'
             }
         }
         stage('Build docker image') {
@@ -31,7 +32,7 @@ pipeline {
             steps {
                 script {
                     withKubeConfig([credentialsId: 'kubectl', serverUrl: 'https://192.168.1.16:6443']) {
-                        sh 'cat Deployment.yaml | sed "s/{{BUILD_NUMBER}}/${BUILD_NUMBER:=1}/g" | kubectl apply -f -'
+                        sh 'cat k8s/Deployment.yaml | sed "s/{{BUILD_NUMBER}}/${BUILD_NUMBER:=1}/g" | sed "s/{{BRANCH_NAME}}/${BRANCH_NAME}/g" | kubectl apply -f -'
                     }
                 }
             }
