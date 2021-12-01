@@ -28,38 +28,34 @@ pipeline {
                 }
             }
         }
-        stage('Deploy onto k8s') {
-            when ( branch 'canary')
+        stage('Deploy into canary') {
+            when { branch 'canary'}
             steps {
                 script {
                     withKubeConfig([credentialsId: 'kubectl', serverUrl: 'https://192.168.1.16:6443']) {
-                        sh ```
-                            export $BRANCH_NAME 
-                            export $BUILD_NUMBER
-                            envsubst < k8s/deployment.yaml | kubectl apply -f -
-                            envsubst < k8s/service.yaml | kubectl apply -f -
+                        sh '''
+                            /usr/local/bin/envsubst < k8s/Deployment.yaml | kubectl apply -n python-app -f -
+                            /usr/local/bin/envsubst < k8s/service.yaml | kubectl apply -n python-app -f -
                             export WEIGHT_CANARY=10
                             export WEIGHT_PROD=90
-                            envsubst < k8s/ingress.yaml | kubectl apply -f -    
-                        ```
+                            /usr/local/bin/envsubst < k8s/ingress.yaml | kubectl apply -n python-app -f -    
+                        '''
                     }
                 }
             }
         }
-        stage('Deploy onto k8s') {
-            when ( branch 'main')
+        stage('Deploy into production') {
+            when { branch 'main'}
             steps {
                 script {
                     withKubeConfig([credentialsId: 'kubectl', serverUrl: 'https://192.168.1.16:6443']) {
-                        sh ```
-                            export $BRANCH_NAME 
-                            export $BUILD_NUMBER
-                            envsubst < k8s/deployment.yaml | kubectl apply -f -
-                            envsubst < k8s/service.yaml | kubectl apply -f -
+                        sh '''
+                            envsubst < k8s/deployment.yaml | kubectl apply -n python-app -f -
+                            envsubst < k8s/service.yaml | kubectl apply -n python-app -f -
                             export WEIGHT_CANARY=0
                             export WEIGHT_PROD=100
-                            envsubst < k8s/ingress.yaml | kubectl apply -f -    
-                        ```
+                            envsubst < k8s/ingress.yaml | kubectl apply -n python-app -f -    
+                        '''
                     }
                 }
             }

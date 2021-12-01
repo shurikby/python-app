@@ -4,20 +4,22 @@ metadata:
   creationTimestamp: null
   labels:
     app: python-app
-  name: python-app
+    branch: $BRANCH_NAME
+  name: python-app-$BRANCH_NAME
 spec:
   replicas: 3     # 3 replicas of our application
   selector:
     matchLabels:
-      app: python-app
+      branch: $BRANCH_NAME
   template:
     metadata:
       creationTimestamp: null
       labels:
         app: python-app
+        branch: $BRANCH_NAME
     spec:
       containers:
-      - image: shurikby/python-app:v1.0
+      - image: shurikby.jfrog.io/final-docker/python-app/${BRANCH_NAME}:${BUILD_NUMBER}
         name: python-app
         readinessProbe:
           httpGet:
@@ -39,4 +41,6 @@ spec:
           requests:
             memory: "40Mi"
             cpu: "5m"
+      imagePullSecrets:
+      - name: jfrog-docker
 status: {}
