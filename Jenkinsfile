@@ -37,7 +37,7 @@ pipeline {
                             envsubst < k8s/deploy.yaml | kubectl apply -f -
                             export WEIGHT_CANARY=100
                             export WEIGHT_MAIN=0
-                            envsubst < k8s/ingress.yaml | kubectl apply -n python-app -f - 
+                            envsubst < k8s/ingress.yaml | kubectl apply -f - 
                         '''
                     }
                 }
@@ -52,7 +52,7 @@ pipeline {
                             envsubst < k8s/deploy.yaml | kubectl apply -f -
                             export WEIGHT_CANARY=100
                             export WEIGHT_MAIN=0
-                            envsubst < k8s/ingress.yaml | kubectl apply -n python-app -f -  
+                            envsubst < k8s/ingress.yaml | kubectl apply -f -  
                         '''
                     }
                 }
