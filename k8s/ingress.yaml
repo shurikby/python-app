@@ -1,19 +1,19 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: python-app-main
+  name: app-ingress
   namespace: canary
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/canary: "true"
-    nginx.ingress.kubernetes.io/canary-weight: "${WEIGHT_MAIN}"
+    nginx.ingress.kubernetes.io/canary-weight: "30"
 spec:
   rules:
   - http:
       paths:
        - backend:
            service:
-             name: python-app-main
+             name: python-app
              port: 
                number: 8080
          path: /
@@ -22,19 +22,17 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: python-app-canary
+  name: app-ingress
   namespace: main
   annotations:
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/canary: "true"
-    nginx.ingress.kubernetes.io/canary-weight: "${WEIGHT_CANARY}"
 spec:
   rules:
   - http:
       paths:
        - backend:
            service:
-             name: python-app-canary
+             name: python-app
              port: 
                number: 8080
          path: /

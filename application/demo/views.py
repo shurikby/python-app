@@ -20,7 +20,7 @@ async def app_info(request: web.Request):
             HOSTNAME,
             VERSION,
             BUILD,
-            BRANCH
+            BRANCH,
         )
     )
 
