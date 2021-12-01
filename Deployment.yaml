@@ -22,7 +22,7 @@ spec:
         app: python-app
     spec:
       containers:
-      - image: shurikby.jfrog.io/final-docker/python-app:{{BUILD_NUMBER}}
+      - image: shurikby.jfrog.io/final-docker/python-app/{{BRANCH_NAME}}:{{BUILD_NUMBER}}
         name: python-app
         readinessProbe:
           httpGet:
