@@ -52,7 +52,7 @@ spec:
           requests:
             memory: "40Mi"
             cpu: "5m"
-      imagePullPolicy: Always
+        imagePullPolicy: Always
       imagePullSecrets:
       - name: jfrog-docker
 status: {}
