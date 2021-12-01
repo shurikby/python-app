@@ -1,0 +1,41 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: python-app-production
+  namespace: python-app
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-weight: "${WEIGHT_PROD}"
+spec:
+  rules:
+  - http:
+      paths:
+       - backend:
+           service:
+             name: main
+             port: 
+               number: 8080
+         path: /
+         pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: python-app-canary
+  namespace: python-app
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-weight: "${WEIGHT_CANARY}"
+spec:
+  rules:
+  - http:
+      paths:
+       - backend:
+           service:
+             name: canary
+             port: 
+               number: 8080
+         path: /
+         pathType: Prefix

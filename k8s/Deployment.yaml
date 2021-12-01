@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: python-app
+    branch: $BRANCH_NAME
+  name: python-app-$BRANCH_NAME
+spec:
+  replicas: 3     # 3 replicas of our application
+  selector:
+    matchLabels:
+      branch: $BRANCH_NAME
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: python-app
+        branch: $BRANCH_NAME
+    spec:
+      containers:
+      - image: shurikby.jfrog.io/final-docker/python-app/${BRANCH_NAME}:${BUILD_NUMBER}
+        name: python-app
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 10
+        resources:
+          limits:
+            memory: "200Mi"
+            cpu: "30m"
+          requests:
+            memory: "40Mi"
+            cpu: "5m"
+      imagePullSecrets:
+      - name: jfrog-docker
+status: {}
