@@ -1,26 +1,36 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: $BRANCH_NAME
+spec: {}
+status: {}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
     app: python-app
-    branch: $BRANCH_NAME
-  name: python-app-$BRANCH_NAME
-  namespace: python-app
+  name: python-app
+  namespace: $BRANCH_NAME
 spec:
   replicas: 3     # 3 replicas of our application
   selector:
     matchLabels:
-      branch: $BRANCH_NAME
+      app: python-app
+  strategy:
+    rollingUpdate:        # Rolling update strategy:
+      maxSurge: 1         # It can be one additional pod during update 
+      maxUnavailable: 1   # One less pods can be up and running during update 
   template:
     metadata:
       creationTimestamp: null
       labels:
         app: python-app
-        branch: $BRANCH_NAME
     spec:
       containers:
-      - image: shurikby/python-app:v1.0
+      - image: shurikby.jfrog.io/final-docker/python-app/${BRANCH_NAME}:${BUILD_NUMBER}
         name: python-app
         readinessProbe:
           httpGet:
@@ -42,4 +52,24 @@ spec:
           requests:
             memory: "40Mi"
             cpu: "5m"
+      imagePullSecrets:
+      - name: jfrog-docker
 status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: python-app
+  name: python-app
+  namespace: $BRANCH_NAME
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: python-app
+status:
+  loadBalancer: {}
