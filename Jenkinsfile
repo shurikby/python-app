@@ -34,11 +34,10 @@ pipeline {
                 script {
                     withKubeConfig([credentialsId: 'kubectl', serverUrl: 'https://192.168.1.16:6443']) {
                         sh '''
-                            /usr/local/bin/envsubst < k8s/Deployment.yaml | kubectl apply -n python-app -f -
-                            /usr/local/bin/envsubst < k8s/service.yaml | kubectl apply -n python-app -f -
-                            export WEIGHT_CANARY=10
-                            export WEIGHT_PROD=90
-                            /usr/local/bin/envsubst < k8s/ingress.yaml | kubectl apply -n python-app -f -    
+                            envsubst < k8s/deploy.yaml | kubectl apply -f -
+                            export WEIGHT_CANARY=100
+                            export WEIGHT_MAIN=0
+                            envsubst < k8s/ingress.yaml | kubectl apply -f - 
                         '''
                     }
                 }
@@ -50,16 +49,16 @@ pipeline {
                 script {
                     withKubeConfig([credentialsId: 'kubectl', serverUrl: 'https://192.168.1.16:6443']) {
                         sh '''
-                            envsubst < k8s/Deployment.yaml | kubectl apply -n python-app -f -
-                            envsubst < k8s/service.yaml | kubectl apply -n python-app -f -
-                            export WEIGHT_CANARY=0
-                            export WEIGHT_PROD=100
-                            envsubst < k8s/ingress.yaml | kubectl apply -n python-app -f -    
+                            envsubst < k8s/deploy.yaml | kubectl apply -f -
+                            export WEIGHT_CANARY=100
+                            export WEIGHT_MAIN=0
+                            envsubst < k8s/ingress.yaml | kubectl apply -f -  
                         '''
                     }
                 }
             }
         }
+
     }
 	post{
 		success {
