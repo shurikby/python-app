@@ -50,7 +50,7 @@ pipeline {
                 script {
                     withKubeConfig([credentialsId: 'kubectl', serverUrl: 'https://192.168.1.16:6443']) {
                         sh '''
-                            envsubst < k8s/deployment.yaml | kubectl apply -n python-app -f -
+                            envsubst < k8s/Deployment.yaml | kubectl apply -n python-app -f -
                             envsubst < k8s/service.yaml | kubectl apply -n python-app -f -
                             export WEIGHT_CANARY=0
                             export WEIGHT_PROD=100
