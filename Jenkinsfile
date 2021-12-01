@@ -28,11 +28,38 @@ pipeline {
                 }
             }
         }
-        stage('Deploy into k8s') {
+        stage('Deploy onto k8s') {
+            when ( branch 'canary')
             steps {
                 script {
                     withKubeConfig([credentialsId: 'kubectl', serverUrl: 'https://192.168.1.16:6443']) {
-                        sh 'cat k8s/Deployment.yaml | sed "s/{{BUILD_NUMBER}}/${BUILD_NUMBER:=1}/g" | sed "s/{{BRANCH_NAME}}/${BRANCH_NAME}/g" | kubectl apply -f -'
+                        sh ```
+                            export $BRANCH_NAME 
+                            export $BUILD_NUMBER
+                            envsubst < k8s/deployment.yaml | kubectl apply -f -
+                            envsubst < k8s/service.yaml | kubectl apply -f -
+                            export WEIGHT_CANARY=10
+                            export WEIGHT_PROD=90
+                            envsubst < k8s/ingress.yaml | kubectl apply -f -    
+                        ```
+                    }
+                }
+            }
+        }
+        stage('Deploy onto k8s') {
+            when ( branch 'main')
+            steps {
+                script {
+                    withKubeConfig([credentialsId: 'kubectl', serverUrl: 'https://192.168.1.16:6443']) {
+                        sh ```
+                            export $BRANCH_NAME 
+                            export $BUILD_NUMBER
+                            envsubst < k8s/deployment.yaml | kubectl apply -f -
+                            envsubst < k8s/service.yaml | kubectl apply -f -
+                            export WEIGHT_CANARY=0
+                            export WEIGHT_PROD=100
+                            envsubst < k8s/ingress.yaml | kubectl apply -f -    
+                        ```
                     }
                 }
             }

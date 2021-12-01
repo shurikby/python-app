@@ -4,14 +4,14 @@ metadata:
   creationTimestamp: null
   labels:
     app: python-app
-  name: python-app
+  name: $BRANCH_NAME
+  namespace: python-app
 spec:
   ports:
   - port: 8080
     protocol: TCP
     targetPort: 8080
   selector:
-    app: python-app
-  type: NodePort
+    branch: $BRANCH_NAME
 status:
   loadBalancer: {}
