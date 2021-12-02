@@ -52,9 +52,9 @@ pipeline {
                     withKubeConfig([credentialsId: 'kubectl', serverUrl: 'https://192.168.1.16:6443']) {
                         sh '''
                             if [ "$BRANCH_NAME" == "canary" ]; then export WEIGHT=20
-                            else WEIGHT=0 fi
-                            envsubst < k8s/ingress.yaml | kubectl apply -f -  
+                            else WEIGHT=0 
                             fi
+                            envsubst < k8s/ingress.yaml | kubectl apply -f -  
                         '''
                     }
                 }
