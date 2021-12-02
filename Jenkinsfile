@@ -54,6 +54,7 @@ pipeline {
                             if [ "$BRANCH_NAME" == "canary" ]; then export WEIGHT=20
                             else WEIGHT=0 fi
                             envsubst < k8s/ingress.yaml | kubectl apply -f -  
+                            fi
                         '''
                     }
                 }
