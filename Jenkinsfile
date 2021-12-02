@@ -28,30 +28,31 @@ pipeline {
                 }
             }
         }
-        stage('Deploy into canary') {
-            when { branch 'canary'}
+        stage('Prepare cluster enviroment') {
             steps {
                 script {
                     withKubeConfig([credentialsId: 'kubectl', serverUrl: 'https://192.168.1.16:6443']) {
-                        sh '''
-                            envsubst < k8s/deploy.yaml | kubectl apply -f -
-                            export WEIGHT_CANARY=100
-                            export WEIGHT_MAIN=0
-                            envsubst < k8s/ingress.yaml | kubectl apply -f - 
-                        '''
+                        sh 'kubectl apply -f k8s/env-prep.yaml'
                     }
                 }
             }
         }
-        stage('Deploy into production') {
-            when { branch 'main'}
+        stage('Deploy application') {
+            steps {
+                script {
+                    withKubeConfig([credentialsId: 'kubectl', serverUrl: 'https://192.168.1.16:6443']) {
+                        sh 'envsubst < k8s/deploy.yaml | kubectl apply -f -'
+                    }
+                }
+            }
+        }
+        stage('Configure ingress') {
             steps {
                 script {
                     withKubeConfig([credentialsId: 'kubectl', serverUrl: 'https://192.168.1.16:6443']) {
                         sh '''
-                            envsubst < k8s/deploy.yaml | kubectl apply -f -
-                            export WEIGHT_CANARY=100
-                            export WEIGHT_MAIN=0
+                            if [ "$BRANCH_NAME" == "canary" ]; then export WEIGHT=20
+                            else WEIGHT=0 fi
                             envsubst < k8s/ingress.yaml | kubectl apply -f -  
                         '''
                     }
